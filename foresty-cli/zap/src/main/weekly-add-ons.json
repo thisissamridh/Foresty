@@ -1,0 +1,63 @@
+[
+  {
+    "cloneUrl": "https://github.com/zaproxy/zap-extensions.git",
+    "projects": [
+      ":addOns:accessControl",
+      ":addOns:alertFilters",
+      ":addOns:ascanrules",
+      ":addOns:ascanrulesBeta",
+      ":addOns:automation",
+      ":addOns:bruteforce",
+      ":addOns:callhome",
+      ":addOns:commonlib",
+      ":addOns:coreLang",
+      ":addOns:diff",
+      ":addOns:directorylistv1",
+      ":addOns:domxss",
+      ":addOns:encoder",
+      ":addOns:exim",
+      ":addOns:formhandler",
+      ":addOns:fuzz",
+      ":addOns:gettingStarted",
+      ":addOns:graaljs",
+      ":addOns:graphql",
+      ":addOns:invoke",
+      ":addOns:network",
+      ":addOns:oast",
+      ":addOns:onlineMenu",
+      ":addOns:openapi",
+      ":addOns:portscan",
+      ":addOns:plugnhack",
+      ":addOns:pscanrules",
+      ":addOns:pscanrulesBeta",
+      ":addOns:quickstart",
+      ":addOns:replacer",
+      ":addOns:reports",
+      ":addOns:requester",
+      ":addOns:retest",
+      ":addOns:retire",
+      ":addOns:reveal",
+      ":addOns:sequence",
+      ":addOns:scripts",
+      ":addOns:selenium",
+      ":addOns:soap",
+      ":addOns:spider",
+      ":addOns:spiderAjax",
+      ":addOns:tips",
+      ":addOns:webdrivers:webdriverlinux",
+      ":addOns:webdrivers:webdrivermacos",
+      ":addOns:webdrivers:webdriverwindows",
+      ":addOns:websocket",
+      ":addOns:zest"
+    ]
+  },
+  {
+    "cloneUrl": "https://github.com/zaproxy/zap-core-help.git",
+    "projects": [
+        ":addOns:help"
+    ]
+  },
+  {
+    "cloneUrl": "https://github.com/zaproxy/zap-hud.git"
+  }
+]

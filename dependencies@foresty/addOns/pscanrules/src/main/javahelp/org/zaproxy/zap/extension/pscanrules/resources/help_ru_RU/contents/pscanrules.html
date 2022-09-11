@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>
+Правила Пассивного Сканирования
+</title>
+</head>
+<body>
+<h1>Правила Пассивного Сканирования</h1>
+The following release status passive scan rules are included in this add-on:
+
+<h2>Заголовок против кликджекинга </h2>
+Это правило сканирования проверяет наличие и действительность заголовка X-Frame-Options или директивы Content-Security-Policy 'frame-ancestors'. <br> 
+При пороговых значениях СРЕДНИЙ и ВЫСОКИЙ учитываются только ответы HTML без ошибок или без переадресации. <br>
+При НИЗКОМ пороге он просматривает все текстовые ответы, включая ошибки и перенаправления. <br>
+Следующие условия могут привести к предупреждению: 
+<ul> 
+ <li><b>Отсутствует заголовок Anti-clickjacking: </b> если заголовок X-Frame-Options полностью отсутствует в ответе. </li>
+ <li><b>Несколько записей заголовка X-Frame-Options: </b> когда в ответе обнаружено более одного заголовка X-Frame-Options. </li>
+ <li><b>Параметры X-Frame, определенные через META (не соответствует спецификации): </b> В ответе была обнаружена запись «http-equiv», которая пытается определить параметры X-Frame, что не поддерживается спецификация. </li>
+ <li><b>Неверный формат параметра X-Frame-Options: </b> в заголовке отсутствует значение или значение не соответствует ожидаемому (т. е. отличается от "DENY" или "SAMEORIGIN"). </li>
+</ul>
+По умолчанию никакие предупреждения не будут выдаваться в ответе, содержащем элемент Content-Security-Policy 'frame-ancestors', поскольку он имеет приоритет над заголовком X-Frame-Options. 
+Однако при НИЗКОМ пороге о вышеуказанных проблемах по-прежнему будет сообщаться, но с НИЗКИМ риском.  
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/AntiClickjackingScanRule.java">AntiClickjackingScanRule.java</a>
+
+<h2>Ошибки приложения</h2>
+Проверьте ответы сервера на наличие ответов типа HTTP 500 — Internal Server Error или тех, которые содержат известную строку ошибки.  <br>
+<strong>Примечание.</strong> Совпадения, сделанные в блоках сценария или файлах, относятся ко всему содержимому, а не только к комментариям.<br>
+При ВЫСОКОМ пороге не выдавать оповещения по HTTP 500 (но делать это для других шаблонов ошибок).<br>
+Для внутренней ошибки сервера (HTTP 500) для предупреждения устанавливается низкий риск, а в других случаях — средний риск. 
+
+<p><strong>Примечание.</strong> Если установлен дополнительный модуль Custom Payloads, вы можете добавить свои собственные строки ошибок приложения (полезные данные) на панели параметров Custom Payloads.  
+Их также будут искать в ответах, поскольку они пассивно сканируются.  Имейте в виду, что чем больше количество полезных нагрузок, тем больше
+количество времени, необходимое для пассивного сканирования. 
+<p>Также можно добавить шаблоны в файл <code>xml/application_errors.xml</code> в пользовательском каталоге ZAP. <br>
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/ApplicationErrorScanRule.java">ApplicationErrorScanRule.java</a>
+ 
+<h2>Управление кешем</h2>
+Проверяет заголовки ответа «Cache-Control» на соответствие общим передовым отраслевым настройкам для защиты конфиденциального содержимого.<br>
+При пороговых значениях СРЕДНИЙ и ВЫСОКИЙ учитываются только текстовые ответы без ошибок или без переадресации (за исключением JavaScript и CSS).<br>
+При НИЗКОМ пороге учитываются все ответы, включая ошибки и редиректы. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CacheControlScanRule.java">CacheControlScanRule.java</a>
+
+<h2>Несоответствие кодировки</h2> 
+<p>Эта проверка определяет ответы, в которых заголовок HTTP Content-Type объявляет кодировку, отличную от кодировки, определенной телом HTML или XML.  При несоответствии набора символов между заголовком HTTP и телом контента веб-браузеры могут быть принудительно переведены в нежелательный режим прослушивания контента, чтобы определить правильный набор символов контента. </p>
+<p>Правило сканирования обрабатывает различные условия в зависимости от порогового значения, установленного для правила, следующим образом: </p>
+<ul>
+  <li>Все пороги: 
+    <ul>
+      <li>Заголовок и кодировка Meta Content-Type. Объявление в заголовке HTTP Content-Type не соответствует тому, что объявлено в теге META Content-Type. </li>
+      <li>Заголовок и кодировка Meta Content-Type. Объявление в заголовке HTTP Content-Type не соответствует тому, что объявлено в теге META Content-Type. </li>
+    </ul>
+  </li>
+  <li>Низкий порог: 
+    <ul>
+      <li>Отсутствует кодировка Meta Content-Type — ответ не содержит объявления META Content-Type, что может не учитывать старые клиенты. </li>
+      <li>Meta Charset по сравнению с Meta Content-Type Charset — ответ содержит как объявление META Content-Type, так и объявление META Charset, и они не совпадают. </li>
+    </ul>
+  </li>
+</ul>
+Дополнительная ссылка: <br>
+<a href="http://www.w3.org/TR/html401/charset.html#h-5.2.2">http://www.w3.org/TR/html401/charset.html#h-5.2.2</a><br>
+<a href="http://www.w3.org/TR/html5/document-metadata.html#charset">http://www.w3.org/TR/html5/document-metadata.html#charset</a>
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CharsetMismatchScanRule.java">CharsetMismatchScanRule.java</a>
+
+<h2>Content Security Policy (CSP) Header Not Set</h2>
+This checks HTML response headers for the presence of a Content Security Policy header.<br>
+By default this rule checks for the presence of the "Content-Security-Policy" header, 
+and at the Low threshold also checks for the "X-Content-Security-Policy" and "X-WebKit-CSP" headers.<br>
+Redirects and non HTML responses are ignored except at the Low threshold.
+<p>
+If a "Content-Security-Policy-Report-Only" header is found on a response an INFO alert is raised. This may represent an enforcement effort 
+that is actively being refined or developed, or one which is only partially implemented.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/ContentSecurityPolicyMissingScanRule.java">ContentSecurityPolicyMissingScanRule.java</a>
+
+<h2>Content Type Missing</h2>
+Raises an alert if the response is lacking a Content-Type header or if the header exists but the value is empty.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/ContentTypeMissingScanRule.java">ContentTypeMissingScanRule.java</a>
+
+<h2>Cookie HttpOnly</h2>
+Ensures that as cookies are set they are flagged HttpOnly. The HttpOnly flag indicates to browsers that the cookie 
+being set should not be acted upon by client side script (such as JavaScript).
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CookieHttpOnlyScanRule.java">CookieHttpOnlyScanRule.java</a>
+
+<h2>Cookie - Loosely Scoped</h2>
+Cookies can be scoped by domain or path. This check is only concerned with domain scope.The domain scope applied to a cookie determines which domains can access it. For example, a cookie can be scoped strictly to a subdomain e.g. <code>www.nottrusted.com</code>, or loosely scoped to a parent domain e.g. <code>nottrusted.com</code>. In the latter case, any subdomain of <code>nottrusted.com</code> can access the cookie. Loosely scoped cookies are common in mega-applications like <code>google.com</code> and <code>live.com</code>.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CookieLooselyScopedScanRule.java">CookieLooselyScopedScanRule.java</a>
+
+<h2>Cookie Secure Flag</h2>
+Looks for cookies set during HTTPS sessions, raises an alert for those that are set but do not include the secure flag.
+A cookie set with the secure flag will not be sent during a plain HTTP session.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CookieSecureFlagScanRule.java">CookieSecureFlagScanRule.java</a>
+
+<h2>Cookie Without SameSite Attribute</h2>
+This reports any cookies that:
+<ul>
+  <li>do not have the SameSite attribute</li>
+  <li>have the attribute set to "None" (ignored at HIGH Threshold)</li>
+  <li>do not have a recognised valid value for that attribute</li>
+</ul>
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CookieSameSiteScanRule.java">CookieSameSiteScanRule.java</a>
+
+<h2>Cross Domain Script Inclusion</h2>
+Validates whether or not scripts are included from domains other than the domain hosting the content. 
+By looking at the "src" attributes of "script" tags in HTML responses.<br>
+Allowed Cross-Domain scripts:  
+<ul>
+<li>Any script with a non-empty "integrity" attribute is ignored - the integrity value is not checked as this will be checked by the browser</li>
+<li>At MEDIUM and HIGH thresholds if a script URL falls within a context that also includes the URL of the base message no alerts will be raised.</li>
+</ul> 
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CrossDomainScriptInclusionScanRule.java">CrossDomainScriptInclusionScanRule.java</a>
+
+<h2>Cross Domain Misconfiguration</h2>
+Passively scan responses for Cross Domain MisConfigurations, which relax the Same Origin Policy in the web browser, for instance.<br>
+The current implementation looks at excessively permissive CORS headers.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CrossDomainMisconfigurationScanRule.java">CrossDomainMisconfigurationScanRule.java</a>
+
+<h2>CSP (Content Security Policy)</h2>
+
+The Content Security Policy (CSP) passive scan rule parses and analyzes CSP headers for potential misconfiguration
+or weakness. This rule leverages Shape Security's <a href="https://github.com/shapesecurity/salvation">Salvation</a> 
+library to perform it's parsing and assessment of CSPs.
+<p>
+If a response has multiple CSPs they are analyzed individually, as there is no sure way to intersect/merge the policies and further different browsers have varying levels of CSP support and enforcement.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/ContentSecurityPolicyScanRule.java">ContentSecurityPolicyScanRule.java</a>
+
+<h2>CSRF Countermeasures</h2>
+This rule identifies "potential" vulnerabilities with the lack of known CSRF 
+countermeasures in pages with forms.<br>
+At HIGH alert threshold only scans messages which are in scope.<br>
+Post 2.5.0 you can specify a comma separated list of identifiers in the 
+<code>rules.csrf.ignorelist</code> parameter via the Options 'Rule configuration' panel.
+Any FORMs with a name or ID that matches one of these identifiers will be ignored when scanning for missing Anti-CSRF tokens.
+Only use this feature to ignore FORMs that you know are safe, for example search forms.
+Form element names are sorted and de-duplicated when they are printed in the Zap Report.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/CsrfCountermeasuresScanRule.java">CsrfCountermeasuresScanRule.java</a>
+
+<h2>Information Disclosure: Debug Errors</h2>
+This passive scan rule checks the content of web responses for known Debug Error message fragments.
+Access to such details may provide a malicious individual with means by which to further abuse the web site.
+They may also leak data not specifically meant for end user consumption.<br>
+Note: Javascript responses are only assessed at LOW threshold.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InformationDisclosureDebugErrorsScanRule.java">InformationDisclosureDebugErrorsScanRule.java</a>
+
+<h2>Information Disclosure: In URL</h2>
+Attempts to identify the existence of sensitive details within the visited URIs themselves 
+(this may include parameters, document names, directory names, etc.).
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InformationDisclosureInUrlScanRule.java">InformationDisclosureInUrlScanRule.java</a>
+
+<h2>Information Disclosure: Referrer</h2>
+Identifies the existence of sensitive details within the Referrer header field of HTTP requests
+(this may include parameters, document names, directory names, etc.).
+<p>
+Note: In the case of suspected credit card identifiers in the Referrer value, the potential credit card numbers are looked up against a Bank Identification
+Number List (BINList). If a match is found the alert is raised at High confidence and additional details are added to the 'Other Information' field in the alert,
+otherwise the alerts will have Medium confidence.
+See: <a href="https://github.com/iannuttall/binlist-data">binlist-data</a> for more information.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InformationDisclosureReferrerScanRule.java">InformationDisclosureReferrerScanRule.java</a>
+
+<h2>Information Disclosure: Suspicious Comments</h2>
+Analyzes web content to identify comments which contain potentially sensitive details. Which may lead to 
+further attack or exposure of unintended data.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InformationDisclosureSuspiciousCommentsScanRule.java">InformationDisclosureSuspiciousCommentsScanRule.java</a>
+
+<h2>Insecure Authentication</h2>
+HTTP basic or digest authentication has been used over an unsecured connection. The credentials can be read and then reused by someone with access to the network.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InsecureAuthenticationScanRule.java">InsecureAuthenticationScanRule.java</a>
+
+<h2>Insecure JSF ViewState</h2>
+The response contains a Java Server Faces (JSF) ViewState value that has no cryptographic protections.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InsecureJsfViewStatePassiveScanRule.java">InsecureJsfViewStatePassiveScanRule.java</a>
+
+<h2>Mixed Content</h2>
+For content served via HTTPS analyse all the src attributes in the response looking for those sourced
+via plain HTTP.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/MixedContentScanRule.java">MixedContentScanRule.java</a>
+
+<h2>Private Address Disclosure</h2>
+Checks the response content for inclusion of RFC 1918 IPv4 addresses as well as 
+Amazon EC2 private hostnames (for example, ip-10-0-56-78). This information can give an attacker 
+useful information about the IP address scheme of the internal network, and might be helpful for 
+further attacks targeting internal systems.
+<p>
+This passive scan rule may generate false positives in the case of larger dotted numeric strings, 
+such as vp09.02.51.10.01.09.16, where the latter 4 octets appear to be a RFC 1918 IPv4 address. 
+After review an analyst can mark such alerts as False Positives in ZAP. For handling during 
+repeated scans the "Context Alert Filters" add-on could be leveraged.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InfoPrivateAddressDisclosureScanRule.java">InfoPrivateAddressDisclosureScanRule.java</a>
+
+<h2>Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s)</h2>
+This checks response headers for the presence of X-Powered-By details.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/XPoweredByHeaderInfoLeakScanRule.java">XPoweredByHeaderInfoLeakScanRule.java</a>
+
+<h2>Session ID in URL Rewrite</h2>
+This scan rule checks for the existence of session token type parameters being rewritten to the URL. 
+To help reduce false positives the rule checks the length of the token value,  if the value of the parameter 
+is not greater than 8 characters in length then the parameter is ignored 
+(i.e.: survey?sId=5 would not be flagged as vulnerable).
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/InfoSessionIdUrlScanRule.java">InfoSessionIdUrlScanRule.java</a>
+
+<h2>Timestamp Disclosure</h2>
+A timestamp was disclosed by the application/web server.<br>
+At HIGH threshold this rule does not alert on potential timestamps that are not within a range of plus or minus one year.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/TimestampDisclosureScanRule.java">TimestampDisclosureScanRule.java</a>
+
+<h2>Username Hash Found</h2>
+If any context contains defined users this scan rule checks all responses for the presence of hashed values representing those usernames.
+<p><strong>Note:</strong> If the Custom Payloads addon is installed you can add your own Username strings (payloads) in the Custom Payloads options panel. 
+They will also be hashed and searched for in responses as they're passively scanned. Keep in mind that the greater the number of payloads the greater the 
+amount of time needed to passively scan. (The default payloads are "Admin" and "admin".)<br>
+<p>Discovery of any such value may represent an Insecure Direct Object Reference (IDOR) vulnerability. Alerts are only raised as informational items as further manual testing is required in order to confirm and assess impact.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/UsernameIdorScanRule.java">UsernameIdorScanRule.java</a>
+
+<h2>VIEWSTATE</h2>
+Attempts to identify VIEWSTATE parameters and analyze said parameters for various best practices or protective 
+measures such as: 
+<ul>
+	<li>Those based on ASP.NET 1.0 and 1.1.</li>
+	<li>VIEWSTATE Lacking signature.</li>
+	<li>Split VIEWSTATE.</li>
+	<li>VIEWSTATE containing email or IP patterns.</li>
+</ul>
+The "Viewstate without MAC Signature (Unsure)" alert will only be raised at LOW threshold.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/ViewstateScanRule.java">ViewstateScanRule.java</a>
+
+<h2>X-Content-Type-Options</h2>
+This scan rule check for the Anti-MIME-Sniffing header X-Content-Type-Options and ensures it is set to 'nosniff'.<br>
+At MEDIUM and HIGH thresholds this rule does not alert on client or server error responses or redirects.<br> 
+At LOW threshold it will alert on all responses including errors and redirects.<br>
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/XContentTypeOptionsScanRule.java">XContentTypeOptionsScanRule.java</a>
+
+<h2>X-AspNet-Version Response Header</h2>
+This checks response headers for the presence of X-AspNet-Version/X-AspNetMvc-Version details.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/XAspNetVersionScanRule.java">XAspNetVersionScanRule.java</a>
+
+<h2>X-Debug-Token Information Leak</h2>
+This checks response headers for the presence of X-Debug-Token and X-Debug-Token-Link details.
+Which indicates the use/exposure of Symfony's Profiler. Symfony's Profiler provides access to a significant amount of information of interest to malicious individuals and Security Testers.
+<p>
+Latest code: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/pscanrules/src/main/java/org/zaproxy/zap/extension/pscanrules/XDebugTokenScanRule.java">XDebugTokenScanRule.java</a>
+
+</body>
+</html>

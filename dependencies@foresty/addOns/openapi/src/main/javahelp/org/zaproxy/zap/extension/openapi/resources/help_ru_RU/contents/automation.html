@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<TITLE>
+OpenAPI Automation Framework Support
+</TITLE>
+</HEAD>
+<BODY>
+<H1>Поддержка инфраструктуры автоматизации OpenAPI </H1>
+Это дополнение поддерживает Automation Framework. 
+<br><br>
+Надстройка добавит определения OpenAPI, если они будут найдены во время поиска, но рекомендуется добавлять их явно через URL-адрес или локальный файл, если они доступны. 
+<br><br>
+Параметр targetUrl работает одинаково для <a href="openapi.html">'Формата целевого URL'</a>. 
+
+<H2>Задание: openapi </H2>
+Задание openapi позволяет импортировать определения OpenAPI через URL-адрес или файл. 
+<pre>
+  - type: openapi                      # Импорт определения OpenAPI 
+    parameters:
+      apiFile:                         # String: Локальный файл, содержащий определение OpenAPI, по умолчанию: null, определение не будет импортировано. 
+      apiUrl:                          # String: URL-адрес, содержащий определение OpenAPI, по умолчанию: null, определение не будет импортировано. 
+      targetUrl:                       # String: URL-адрес, который переопределяет цель, указанную в определении, по умолчанию: null, цель не будет переопределена. 
+</pre>
+
+</BODY>
+</HTML>

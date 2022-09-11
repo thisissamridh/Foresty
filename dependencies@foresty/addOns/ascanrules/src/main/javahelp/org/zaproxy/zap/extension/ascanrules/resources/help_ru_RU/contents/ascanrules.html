@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>
+Правила активного сканирования 
+</title>
+</head>
+<body>
+<h1>Правила активного сканирования</h1>
+The following release status active scan rules are included in this add-on:
+
+<h2>Утечка информации .htaccess </h2>
+Проверяет файлы .htaccess, доступные в Интернете, которые могут привести к утечке конфиденциальной информации.
+(например, имена пользователей, обработка ошибок, перенаправления, настройки списка каталогов и т. д.). 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/HtAccessScanRule.java"> HtAccessScanRule.java </a>
+
+<h2> Переполнение буфера </h2>
+
+Ищет индикаторы переполнения буфера в скомпилированном коде.   Для этого он выводит большие строки входного текста и ищет сбой кода.
+и аварийное закрытие сеанса. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/BufferOverflowScanRule.java"> BufferOverflowScanRule.java </a>
+
+<h2> Внедрение кода </h2>
+
+Это правило отправляет строки атаки PHP и ASP в качестве значений параметров URL-адреса в запросе и проверяет ответ на
+посмотрите, были ли эти значения оценены сервером.  Сначала создаются и отправляются запросы, содержащие внедренные инструкции PHP.
+напечатать токен.  В случае совпадения токена и содержимого тела ответа сканер выдает предупреждение и немедленно возвращается. 
+В случае совпадения токена и содержимого тела сканер выдает предупреждение и немедленно возвращается.  Если текст ответа совпадает с продуктом, возникает предупреждение. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/CodeInjectionScanRule.java"> CodeInjectionScanRule.java </a>
+
+<h2> Внедрение команд </h2>
+
+Это правило отправляет команды * NIX и ОС Windows в качестве значений параметров URL, чтобы определить, проходит ли веб-приложение без флажка.
+пользовательский ввод непосредственно в базовую ОС.  Строки внедрения состоят из метасимволов, которые могут интерпретироваться ОС.
+как команды соединения вместе с полезной нагрузкой, которая должна генерировать вывод в ответе, если приложение уязвимо.  Если содержимое тела ответа
+соответствует полезной нагрузке, сканер выдает предупреждение и немедленно возвращается.  В случае, если ни одна из попыток сопоставления на основе ошибок
+вернуть вывод в ответ, сканер попытается выполнить атаку слепой инъекции, отправив инструкции сна в качестве полезной нагрузки и сравнив время, прошедшее между отправкой запроса
+и получение ответа против эвристического нижнего предела задержки по времени.  Если прошедшее время превышает этот предел, возникает предупреждение со средней степенью достоверности.
+и сканер немедленно возвращается. 
+<br>
+После версии 2.5.0 вы можете изменить время, используемое для атаки слепой инъекции, изменив параметр <code> rules.common.sleep </code> через панель Options 'Rule configuration'. 
+<0>
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/CommandInjectionScaRule.java"> CommandInjectionScaRule.java </a>
+
+<h2> Межсайтовый скриптинг (отражено) </h2>
+
+Это правило начинается с отправки «безопасного» значения и анализа всех мест, в которых это значение встречается в ответе (если есть).  <br>
+Затем он выполняет серию атак, специально нацеленных на то место, где происходит каждый из экземпляров,
+включая атрибуты тегов, атрибуты URL, атрибуты в тегах, которые поддерживают атрибуты src, html-комментарии и т. д.  <br>
+Note: <br>
+This rule only scans HTTP PUT requests at LOW threshold.<br>
+If the alert threshold is set to LOW, XSS injection located in a JSON response results in a LOW risk and LOW confidence alert is raised.
+For other response content-types a LOW confidence alert is raised.<br>
+If the alert threshold is set to either MEDIUM or HIGH, XSS injection located in non-HTML responses do not generate alerts.<br>
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/CrossSiteScriptingScanRule.java"> CrossSiteScriptingScanRule.java </a>
+
+<h2> Межсайтовый скриптинг (постоянный) </h2>
+
+Это правило начинается с отправки уникального «безопасного» значения, а затем выполняется сканирование всего приложения, чтобы найти все места, в которых встречается это значение. <br>
+Затем он выполняет серию атак так же, как и «отраженная» версия, но в этом случае проверяет все
+целевые местоположения на других страницах. <br>
+Примечание: <br>
+Это правило сканирует запросы HTTP PUT только при НИЗКОМ пороге. <br>
+Если XSS-инъекция находится в ответе JSON, возникает предупреждение НИЗКИЙ риск и НИЗКАЯ достоверность. <br>
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/PersistentXssPrimeScanRule.java"> PersistentXssPrimeScanRule.java </a>,
+<a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/PersistentXssSpiderScanRule.java"> PersistentXssSpiderScanRule.java </a>,
+<a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/PersistentXssScanRule.java"> PersistentXssScanRule.java </a>
+
+<h2> Внедрение CRLF </h2>
+
+Это правило отправляет различные специальные символы CRLF перед введенным заголовком «Set-Cookie» в качестве параметра на сервер.  Если ответ содержит идентичный заголовок Set-Cookie,
+появляется предупреждение, и сканер немедленно возвращается. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/CrlfInjectionScanRule.java"> CrlfInjectionScanRule.java </a>
+
+<h2> Просмотр каталогов </h2>
+
+Это правило проверяет, предоставит ли запрос доступ к списку каталогов, исследуя тело ответа на наличие шаблонов, используемых с Apache, IIS.
+и другое программное обеспечение веб-сервера. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/DirectoryBrowsingScanRule.java"> DirectoryBrowsingScanRule.java </a>
+
+<h2> Утечка информации ELMAH </h2>
+Проверяет, доступен ли HTTP-модуль модулей регистрации ошибок и обработчиков (elmah.axd).  Хотя этот модуль удобен для
+разработчикам и другим заинтересованным сторонам также может произойти утечка значительного объема информации, которую аналитик безопасности или злоумышленник
+может быть интересно. <br> <br>
+Правило сканирования ELMAH нацелено на технологии Microsoft: IIS, Windows, ASP и MSSQL. <br>
+О файлах сообщается только в том случае, если они содержат текст «Журнал ошибок для», если не установлен НИЗКИЙ порог предупреждения. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/ElmahScanRule.java"> ElmahScanRule.java </a>
+
+<h2> Внешнее перенаправление </h2>
+
+Это правило отправляет различные строки перенаправления URL-адресов в качестве значений параметров в запросе, а затем проверяет заголовки и тела ответов, чтобы определить
+произошло ли перенаправление и какого типа.  Причина перенаправления ищется в полях заголовка «Местоположение» и «Обновить», а также по метатегам HTML.
+и Javascript в теле ответа.  Выдается предупреждение с указанием типа перенаправления, и сканер немедленно возвращается. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/ExternalRedirectScanRule.java"> ExternalRedirectScanRule.java </a>
+
+<h2> Ошибка строки формата </h2>
+Ищет индикаторы ошибок обработки строки формата в скомпилированном коде.   Он делает это, выводя строки входящего текста на основе символов.
+скомпилированный код C предполагает создание форматированного вывода и поиск сбоев кода и аварийного закрытия сеанса. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/FormatStringScanRule.java"> FormatStringScanRule.java </a>
+
+<h2> Изменение параметров </h2>
+
+Это правило отправляет запросы со значениями параметров, которые, как известно, вызывают отображение ошибок для пользователя при неправильной обработке.  Ответы проверяются, чтобы убедиться, что они вернутся
+код состояния ошибки сервера, затем сравнивается с нормальным ответом HTTP, чтобы убедиться, что он не вызывает предупреждение, если неверный параметр не влияет на вывод.  Наконец, содержание
+тела ответа сравнивается с различными шаблонами, которые можно найти в ошибках сервлета Java, Microsoft VBScript, OLEDB, JET, PHP и Tomcat.  Если совпадение найдено, появляется предупреждение и
+сканер немедленно возвращается. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/ParameterTamperScanRule.java"> ParameterTamperScanRule.java </a>
+
+<h2> Обход пути </h2>
+
+Это правило пытается получить доступ к файлам и каталогам за пределами корня веб-документа, создавая различные комбинации префиксов путей.
+и локальные файловые цели для систем Windows и * NIX, а также сервлетов Java.  Если тело ответа соответствует шаблону, соответствующему
+текущего целевого файла возникает предупреждение, и сканер немедленно возвращается.  Если ни одна из общих локальных файловых целей не завершается успешно, обход пути выполняется.
+попытался использовать имя файла в URL-адресе.  Пока отправка произвольного имени файла не возвращает код состояния ОК, а реальное имя файла возвращает, возникает предупреждение
+и сканер немедленно возвращается. 
+<p>
+Примечание. В этом правиле сканирования есть одна проверка, которая исключена при высоком пороге предупреждения. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/PathTraversalScanRule.java"> PathTraversalScanRule.java </a>
+
+<h2> Включить удаленный файл </h2>
+
+Это правило отправляет серию запросов с внешними URL-адресами в качестве значений параметров и ищет совпадение между телом ответа и заголовком страницы.
+размещены по этим URL-адресам.  Если есть совпадение между ожидаемой строкой и телом ответа, а заголовок вернул код состояния 200, возникает предупреждение и сканер
+немедленно возвращается. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/RemoteFileIncludeScanRule.java"> RemoteFileIncludeScanRule.java </a>
+
+<h2> Включить на стороне сервера </h2>
+
+Это правило проверяет, на какой ОС работает сервер, а затем отправляет запросы с соответствующей директивой HTML SSI в качестве значения параметра.  Если тело ответа совпадает
+шаблон, указывающий, что SSI был успешным, выдается предупреждение, и сканер немедленно возвращается. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/ServerSideIncludeScanRule.java"> ServerSideIncludeScanRule.java </a>
+
+<h2> Раскрытие исходного кода - / WEB-INF </h2>
+Воспользуйтесь наличием незащищенной папки / WEB-INF для загрузки и декомпиляции классов Java, чтобы раскрыть исходный код Java. 
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/SourceCodeDisclosureWebInfScanRule.java"> SourceCodeDisclosureWebInfScanRule.java </a>
+
+<h2> SQL-инъекция </h2>
+
+Этот сканер сканирует уязвимости SQL Injection независимо от РСУБД,
+путем атаки на параметры URL и параметры формы с фрагментами действительного и недопустимого синтаксиса SQL, с использованием ошибок,
+Методы SQL-инъекции на основе логических, объединяемых и составных запросов.  <br>
+Этот сканер может отследить СУБД, если приложение выдает известное сообщение об ошибке SQL, специфичное для СУБД.  <br>
+Этот сканер не использует какие-либо специфические методы РСУБД, и поэтому является лучшим сканером SQL-инъекций для использования в качестве отправной точки.  
+<p>
+Последний код: <a href="https://github.com/zaproxy/zap-extensions/blob/main/addOns/ascanrules/src/main/java/org/zaproxy/zap/extension/ascanrules/SqlInjectionScanRule.java"> SqlInjectionScanRule.java </a> 
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<TITLE>
+Automation Framework - addOns Job
+</TITLE>
+</HEAD>
+<BODY>
+<H1>Automation Framework - работа над надстройками </H1>
+
+Это задание позволяет вам управлять надстройками ZAP. 
+<p>
+Идентификаторы надстроек для использования в списках «установка» и «удаление» отображаются в диалоговом окне «Управление надстройками» ZAP Desktop или в диалоговом окне «Управление надстройками».
+можно найти на странице <a href="https://www.zaproxy.org/addons/"> ZAP Marketplace </a>. 
+
+<H2>YAML</H2>
+
+<pre>
+  - type: addOns                       # Управление дополнениями 
+    parameters:
+      updateAddOns: false              # В настоящее время отключен из-за проблем с обновлением фреймворка и заданий во время их работы. 
+    install:                           # Список нестандартных надстроек для установки с ZAP Marketplace 
+    uninstall:                         # Список стандартных надстроек для удаления 
+</pre>
+
+</BODY>
+</HTML>
+

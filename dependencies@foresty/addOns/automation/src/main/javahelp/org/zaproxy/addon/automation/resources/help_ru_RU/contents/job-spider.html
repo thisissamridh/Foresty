@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<TITLE>
+Automation Framework - spider Job
+</TITLE>
+</HEAD>
+<BODY>
+<H1>Платформа автоматизации — Задание паука</H1>
+
+Это задание  выполняется традиционным пауком.  Это быстро, но не так эффективно работает с современными приложениями. 
+<p>
+По умолчанию это задание будет сканировать первый контекст, определенный в <a href="environment.html">среде</a>, поэтому ни один из параметров не является обязательным. 
+
+<H2>YAML</H2>
+
+<pre>
+  - type: spider                       # The traditional spider - fast but doesnt handle modern apps so well
+    parameters:
+      context:                         # String: Name of the context to spider, default: first context
+      user:                            # String: An optional user to use for authentication, must be defined in the env
+      url:                             # String: Url to start spidering from, default: first context URL
+      maxDuration:                     # Int: The max time in minutes the spider will be allowed to run for, default: 0 unlimited
+      maxDepth:                        # Int: Максимальная глубина дерева для исследования, по умолчанию 5 
+      maxChildren:                     # Int: Максимальное количество дочерних элементов, добавляемых к каждому узлу в дереве. 
+      acceptCookies:                   # Bool: Будет ли паук принимать файлы cookie, по умолчанию: true 
+      handleODataParametersVisited:    # Bool: Будет ли паук обрабатывать ответы OData, по умолчанию: false 
+      handleParameters:                # Enum [ignore_completely, ignore_value, use_all]: как параметры строки запроса используются при проверке того, был ли уже посещен URI, по умолчанию: use_all 
+      maxParseSizeBytes:               # Int: Максимальный размер ответа, который будет проанализирован, по умолчанию: 2621440 - 2,5 Мб. 
+      parseComments:                   # Bool: Будет ли паук анализировать HTML-комментарии для поиска URL-адресов, по умолчанию: true 
+      parseGit:                        # Bool: Будет ли паук анализировать метаданные Git для поиска URL-адресов, по умолчанию: false 
+      parseRobotsTxt:                  # Bool: Будет ли паук анализировать файлы robots.txt для поиска URL-адресов, по умолчанию: <', '<=']: Operator used for testing
+        value: 100                                      # Int: Change this to the number of URLs you expect to find
+        onFail: 'info'                                  # String: One of 'warn', 'error', 'info', mandatory
+</pre>
+
+</BODY>
+</HTML>
+
